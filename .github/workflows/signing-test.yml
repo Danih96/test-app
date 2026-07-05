@@ -35,3 +35,12 @@ jobs:
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$TAG")
           echo "Resolved digest ref: $DIGEST"
           echo "digest-ref=$DIGEST" >> "$GITHUB_OUTPUT"
+
+  call-image-signing:
+    needs: build-and-push
+    uses: Danih96/standardized-security/.github/workflows/image-signing.yml@main
+    with:
+      image-ref: ${{ needs.build-and-push.outputs.digest-ref }}
+    permissions:
+      id-token: write
+      packages: write
