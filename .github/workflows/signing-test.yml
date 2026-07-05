@@ -44,3 +44,17 @@ jobs:
     permissions:
       id-token: write
       packages: write
+
+  verify-signed:
+    needs: [build-and-push, call-image-signing]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Verify signature
+        run: |
+          cosign verify \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity-regexp "^https://github.com/Danih96/standardized-security/.github/workflows/image-signing.yml@.*" \
+            ${{ needs.build-and-push.outputs.digest-ref }}
