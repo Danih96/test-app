@@ -58,3 +58,48 @@ jobs:
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
             --certificate-identity-regexp "^https://github.com/Danih96/standardized-security/.github/workflows/image-signing.yml@.*" \
             ${{ needs.build-and-push.outputs.digest-ref }}
+
+  build-unsigned:
+    runs-on: ubuntu-latest
+    outputs:
+      digest-ref: ${{ steps.build.outputs.digest-ref }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push UNSIGNED test image
+        id: build
+        run: |
+          REPO_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          TAG="ghcr.io/${REPO_LOWER}:${GITHUB_HEAD_REF//\//-}-unsigned"
+          docker build -t "$TAG" .
+          docker push "$TAG"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$TAG")
+          echo "Resolved digest ref: $DIGEST"
+          echo "digest-ref=$DIGEST" >> "$GITHUB_OUTPUT"
+
+  verify-unsigned-fails:
+    needs: build-unsigned
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Verify unsigned image (expected to be rejected)
+        run: |
+          if cosign verify \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity-regexp "^https://github.com/Danih96/standardized-security/.github/workflows/image-signing.yml@.*" \
+            ${{ needs.build-unsigned.outputs.digest-ref }}; then
+            echo "FAIL: verification unexpectedly succeeded on an unsigned image"
+            exit 1
+          else
+            echo "OK: verification correctly rejected the unsigned image"
+          fi
