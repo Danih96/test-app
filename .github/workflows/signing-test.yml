@@ -79,7 +79,7 @@ jobs:
         run: |
           REPO_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           TAG="ghcr.io/${REPO_LOWER}:${GITHUB_HEAD_REF//\//-}-unsigned"
-          docker build -t "$TAG" .
+          docker build -f Dockerfile.unsigned --build-arg CACHE_BUST="${GITHUB_RUN_ID}" -t "$TAG" .
           docker push "$TAG"
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$TAG")
           echo "Resolved digest ref: $DIGEST"

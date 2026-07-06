@@ -1,0 +1,3 @@
+FROM alpine:3.21
+ARG CACHE_BUST=unknown
+RUN echo "unsigned-test-${CACHE_BUST}" > /unsigned-marker
