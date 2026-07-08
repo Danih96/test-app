@@ -1,0 +1,12 @@
+name: Policy as Code
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    uses: Danih96/standardized-security/.github/workflows/policy-as-code.yml@main
