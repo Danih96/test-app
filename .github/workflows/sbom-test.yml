@@ -35,6 +35,6 @@ jobs:
 
   call-sbom-generation:
     needs: build-and-push
-    uses: Danih96/standardized-security/.github/workflows/sbom-generation.yml@main
+    uses: Danih96/standardized-security/.github/workflows/sbom-generation.yml@v1
     with:
       image-ref: ${{ needs.build-and-push.outputs.image }}
