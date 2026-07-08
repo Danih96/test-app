@@ -4,9 +4,12 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   secret-detection:
-    uses: Danih96/standardized-security/.github/workflows/secret-detection.yml@main
+    uses: Danih96/standardized-security/.github/workflows/secret-detection.yml@v1
 
   dependency-scanning:
-    uses: Danih96/standardized-security/.github/workflows/dependency-scanning.yml@main
+    uses: Danih96/standardized-security/.github/workflows/dependency-scanning.yml@v1

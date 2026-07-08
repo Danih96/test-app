@@ -38,7 +38,7 @@ jobs:
 
   call-image-signing:
     needs: build-and-push
-    uses: Danih96/standardized-security/.github/workflows/image-signing.yml@main
+    uses: Danih96/standardized-security/.github/workflows/image-signing.yml@v1
     with:
       image-ref: ${{ needs.build-and-push.outputs.digest-ref }}
     permissions:
