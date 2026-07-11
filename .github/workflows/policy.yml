@@ -1,8 +1,18 @@
 name: Policy as Code
 
+# Milestone 6 (SEC-0501) NEGATIVE test. Runs the platform's reusable Policy
+# as Code workflow against this repo's own workflow files. This run is
+# EXPECTED TO FAIL: 5 workflows pin reusable workflows by the mutable '@main'
+# ref (Policy 1) and security.yml declares no 'permissions:' block (Policy 2).
+# A red run here proves the policy rejects real violations.
+#
+# Triggered on push to this test branch only, so it runs in isolation without
+# firing the other pull_request-triggered workflows (which build/push images).
+
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: [test/milestone-6-policy-as-code]
+  workflow_dispatch:
 
 permissions:
   contents: read
